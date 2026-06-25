@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ test.title }}{% endblock %}
+
+{% block content %}
+<section class="card" style="padding:24px; max-width:780px; margin:34px auto;">
+  <span class="badge">{{ test.get_skill_display }} · {{ test.get_section_type_display }}</span>
+  <h1 style="margin:12px 0 8px;">{{ test.title }}</h1>
+  <p class="muted">{{ test.duration_minutes }} minutes{% if test.audio_file %} · Includes audio{% endif %}</p>
+  <div class="action-row">
+    <a class="button" href="{% url 'practice:start_test_attempt' test.slug %}">Start test</a>
+    {% if latest_attempt and not latest_attempt.is_locked %}
+      <a class="button secondary" href="{% url 'practice:test_runner' latest_attempt.id %}">Continue attempt</a>
+    {% endif %}
+    <a class="button secondary" href="{% url 'practice:test_list' %}">Back</a>
+  </div>
+</section>
+{% endblock %}

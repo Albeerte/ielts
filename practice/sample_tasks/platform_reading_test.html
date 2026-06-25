@@ -1,0 +1,167 @@
+<div class="ielts-platform-sample">
+  <style>
+    .ielts-platform-sample {
+      color: #172033;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .ielts-platform-sample .sample-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr);
+      gap: 18px;
+    }
+
+    .ielts-platform-sample .sample-panel {
+      border: 1px solid #d8e0ec;
+      border-radius: 8px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .ielts-platform-sample .sample-panel h2,
+    .ielts-platform-sample .sample-panel h3 {
+      margin: 0;
+      padding: 14px 16px;
+      border-bottom: 1px solid #d8e0ec;
+      background: #f8fafc;
+    }
+
+    .ielts-platform-sample .sample-body {
+      padding: 16px;
+      line-height: 1.65;
+    }
+
+    .ielts-platform-sample .question-card {
+      margin: 0 0 14px;
+      padding: 12px;
+      border: 1px solid #d8e0ec;
+      border-radius: 8px;
+      scroll-margin-top: 130px;
+    }
+
+    .ielts-platform-sample label {
+      display: block;
+      margin: 7px 0;
+      padding: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .ielts-platform-sample label.selected {
+      border-color: #1d4ed8;
+      background: #eff6ff;
+    }
+
+    .ielts-platform-sample input[type="text"] {
+      min-height: 36px;
+      border: 1px solid #b9c6d8;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .ielts-platform-sample .navigator {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .ielts-platform-sample .navigator button {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #d8e0ec;
+      border-radius: 6px;
+      background: #ffffff;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .ielts-platform-sample .navigator button.answered {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #ffffff;
+    }
+
+    @media (max-width: 860px) {
+      .ielts-platform-sample .sample-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="sample-grid">
+    <article class="sample-panel">
+      <h2>Reading Passage 1: Urban Gardens</h2>
+      <div class="sample-body">
+        <p><strong>A</strong> In many large cities, unused land has been converted into community gardens. These spaces are usually managed by local residents, who grow vegetables, herbs, and flowers together.</p>
+        <p><strong>B</strong> Supporters claim that urban gardens improve public health because they encourage people to spend time outdoors and eat fresh food. They may also strengthen social ties by giving neighbours a shared project.</p>
+        <p><strong>C</strong> However, not every garden succeeds. Some projects struggle when volunteers move away or when landowners decide to sell the site. Long-term agreements and clear leadership are often needed.</p>
+        <p><strong>D</strong> Researchers have found that the best gardens combine practical food production with education. Workshops on composting, water saving, and seasonal planting can make the garden useful even for people who do not have their own plot.</p>
+      </div>
+    </article>
+
+    <aside class="sample-panel">
+      <h3>Questions 1-8</h3>
+      <div class="sample-body">
+        <div class="navigator">
+          <button type="button" data-nav="1">1</button>
+          <button type="button" data-nav="2">2</button>
+          <button type="button" data-nav="3">3</button>
+          <button type="button" data-nav="4">4</button>
+          <button type="button" data-nav="5">5</button>
+          <button type="button" data-nav="6">6</button>
+          <button type="button" data-nav="7">7</button>
+          <button type="button" data-nav="8">8</button>
+        </div>
+
+        <section class="question-card" data-question-block="1">
+          <p>1. Community gardens are always managed by city governments.</p>
+          <label><input type="radio" name="1" data-question="1" value="TRUE"> TRUE</label>
+          <label><input type="radio" name="1" data-question="1" value="FALSE"> FALSE</label>
+          <label><input type="radio" name="1" data-question="1" value="NOT GIVEN"> NOT GIVEN</label>
+        </section>
+
+        <section class="question-card" data-question-block="2">
+          <p>2. Urban gardens may help neighbours work together.</p>
+          <label><input type="radio" name="2" data-question="2" value="TRUE"> TRUE</label>
+          <label><input type="radio" name="2" data-question="2" value="FALSE"> FALSE</label>
+          <label><input type="radio" name="2" data-question="2" value="NOT GIVEN"> NOT GIVEN</label>
+        </section>
+
+        <section class="question-card" data-question-block="3">
+          <p>3. Researchers say every city should build gardens instead of parks.</p>
+          <label><input type="radio" name="3" data-question="3" value="TRUE"> TRUE</label>
+          <label><input type="radio" name="3" data-question="3" value="FALSE"> FALSE</label>
+          <label><input type="radio" name="3" data-question="3" value="NOT GIVEN"> NOT GIVEN</label>
+        </section>
+
+        <section class="question-card" data-question-block="4">
+          <p>4. Some gardens struggle when <input type="text" name="4" data-question="4"> move away.</p>
+        </section>
+
+        <section class="question-card" data-question-block="5">
+          <p>5. Workshops can teach people about <input type="text" name="5" data-question="5"> and water saving.</p>
+        </section>
+
+        <section class="question-card" data-question-block="6">
+          <p>6. Which paragraph mentions social benefits?</p>
+          <label><input type="radio" name="6" data-question="6" value="A"> A</label>
+          <label><input type="radio" name="6" data-question="6" value="B"> B</label>
+          <label><input type="radio" name="6" data-question="6" value="C"> C</label>
+        </section>
+
+        <section class="question-card" data-question-block="7">
+          <p>7. Which paragraph mentions legal or ownership problems?</p>
+          <label><input type="radio" name="7" data-question="7" value="B"> B</label>
+          <label><input type="radio" name="7" data-question="7" value="C"> C</label>
+          <label><input type="radio" name="7" data-question="7" value="D"> D</label>
+        </section>
+
+        <section class="question-card" data-question-block="8">
+          <p>8. The best gardens combine food production with <input type="text" name="8" data-question="8">.</p>
+        </section>
+      </div>
+    </aside>
+  </div>
+</div>

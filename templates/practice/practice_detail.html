@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }} | IELTS Practice{% endblock %}
+{% block main_class %}practice-page{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .practice-page {
+      margin: 0;
+    }
+
+    .django-practice-bar {
+      position: sticky;
+      top: 58px;
+      z-index: 45;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid #d8e0ec;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .django-practice-title {
+      min-width: 0;
+    }
+
+    .django-practice-title h1 {
+      margin: 0;
+      font-size: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .django-practice-meta {
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .django-practice-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .django-timer {
+      min-width: 86px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .django-save-status {
+      min-width: 88px;
+      color: #64748b;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    @media (max-width: 700px) {
+      .django-practice-bar {
+        top: 83px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .django-practice-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="django-practice-bar">
+    <div class="django-practice-title">
+      <h1>{{ task.title }}</h1>
+      <div class="django-practice-meta">
+        {{ task.get_test_type_display }} · Section {{ task.section_number }} · Attempt #{{ attempt.id }}
+      </div>
+    </div>
+    <div class="django-practice-actions">
+      <span class="django-save-status" id="ieltsSaveStatus" data-save-status>Not saved yet</span>
+      <span class="django-timer" id="ieltsTimer" data-ielts-timer>{{ task.duration_minutes }}:00</span>
+    </div>
+  </div>
+
+  <input type="hidden" id="attemptId" value="{{ attempt.id }}">
+  {{ existing_answers|json_script:"existingAnswersData" }}
+  {{ existing_highlights|json_script:"existingHighlightsData" }}
+  {{ existing_notes|json_script:"existingNotesData" }}
+
+  <section id="uploadedTaskContent">
+    {{ task.html_content|safe }}
+  </section>
+
+  <script>
+    (function () {
+      const attemptId = "{{ attempt.id }}";
+      const saveUrl = "{{ save_url }}";
+      const submitUrl = "{{ submit_url }}";
+      const resultUrl = "{% url 'practice:result' attempt.id %}";
+      const durationSeconds = Number("{{ task.duration_minutes }}") * 60;
+      const startedAt = new Date("{{ attempt.started_at|date:'c' }}").getTime();
+      const existingAnswers = JSON.parse(document.getElementById("existingAnswersData").textContent || "{}");
+      const existingHighlights = JSON.parse(document.getElementById("existingHighlightsData").textContent || "[]");
+      const existingNotes = JSON.parse(document.getElementById("existingNotesData").textContent || "[]");
+      let isDirty = false;
+      let isSubmitted = false;
+      let timerHandle = null;
+      let autoSaveHandle = null;
+
+      function getCookie(name) {
+        const cookies = document.cookie ? document.cookie.split(";") : [];
+        for (const cookie of cookies) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(name + "=")) {
+            return decodeURIComponent(trimmed.slice(name.length + 1));
+          }
+        }
+        return "";
+      }
+
+      function defaultCollectAnswers() {
+        const answers = {};
+        const fields = document.querySelectorAll("[data-question], input[name], select[name], textarea[name]");
+        fields.forEach((field) => {
+          const question = field.dataset.question || field.name;
+          if (!question) return;
+
+          if (field.type === "radio") {
+            if (field.checked) answers[question] = field.value;
+            return;
+          }
+
+          if (field.type === "checkbox") {
+            if (!answers[question]) answers[question] = [];
+            if (field.checked) answers[question].push(field.value);
+            return;
+          }
+
+          if (field.value.trim() !== "") answers[question] = field.value.trim();
+        });
+        return answers;
+      }
+
+      function restoreAnswers() {
+        Object.entries(existingAnswers).forEach(([question, value]) => {
+          const selector = `[data-question="${CSS.escape(question)}"], [name="${CSS.escape(question)}"]`;
+          document.querySelectorAll(selector).forEach((field) => {
+            if (field.type === "radio" || field.type === "checkbox") {
+              field.checked = Array.isArray(value) ? value.includes(field.value) : field.value === String(value);
+            } else {
+              field.value = Array.isArray(value) ? value.join(", ") : value;
+            }
+          });
+        });
+        if (typeof window.markAnswered === "function") {
+          window.markAnswered();
+        }
+      }
+
+      function collect() {
+        if (typeof window.collectAnswers === "function") {
+          return window.collectAnswers();
+        }
+        return defaultCollectAnswers();
+      }
+
+      function defaultCollectHighlights() {
+        return [];
+      }
+
+      function defaultCollectNotes() {
+        return [];
+      }
+
+      function collectHighlights() {
+        if (typeof window.collectHighlights === "function") {
+          return window.collectHighlights();
+        }
+        return defaultCollectHighlights();
+      }
+
+      function collectNotes() {
+        if (typeof window.collectNotes === "function") {
+          return window.collectNotes();
+        }
+        return defaultCollectNotes();
+      }
+
+      function restoreAnnotations() {
+        if (typeof window.restoreHighlights === "function") {
+          window.restoreHighlights(existingHighlights);
+        }
+        if (typeof window.restoreNotes === "function") {
+          window.restoreNotes(existingNotes);
+        }
+      }
+
+      function showSaveStatus(message, state) {
+        document.querySelectorAll("[data-save-status], #ieltsSaveStatus").forEach((element) => {
+          element.textContent = message;
+          element.dataset.state = state || "";
+        });
+        if (typeof window.showSaveStatus === "function" && window.showSaveStatus !== showSaveStatus) {
+          window.showSaveStatus(message, state);
+        }
+      }
+
+      function calculateTimeSpent() {
+        return Math.max(Math.floor((Date.now() - startedAt) / 1000), 0);
+      }
+
+      async function postJson(url, payload) {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.success === false) {
+          throw new Error(data.error || "The request could not be completed.");
+        }
+        return data;
+      }
+
+      async function saveAnswers(answers) {
+        showSaveStatus("Saving...", "saving");
+        const data = await postJson(saveUrl, {
+          answers: answers || collect(),
+          highlights: collectHighlights(),
+          notes: collectNotes(),
+        });
+        isDirty = false;
+        showSaveStatus("Saved", "saved");
+        return data;
+      }
+
+      async function submitAnswers(answers, timeSpentSeconds) {
+        showSaveStatus("Submitting...", "saving");
+        const data = await postJson(submitUrl, {
+          answers: answers || collect(),
+          highlights: collectHighlights(),
+          notes: collectNotes(),
+          time_spent_seconds: timeSpentSeconds || calculateTimeSpent(),
+        });
+        isSubmitted = true;
+        window.location.href = data.redirect_url || resultUrl;
+        return data;
+      }
+
+      function startTimer() {
+        const update = () => {
+          const remaining = Math.max(durationSeconds - calculateTimeSpent(), 0);
+          const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+          const seconds = String(remaining % 60).padStart(2, "0");
+          document.querySelectorAll("[data-ielts-timer], #ieltsTimer").forEach((element) => {
+            element.textContent = `${minutes}:${seconds}`;
+            element.dataset.warning = remaining <= 300 ? "true" : "false";
+          });
+          if (remaining === 0) {
+            clearInterval(timerHandle);
+            submitAnswers(collect(), calculateTimeSpent()).catch((error) => showSaveStatus(error.message, "error"));
+          }
+        };
+        update();
+        timerHandle = setInterval(update, 1000);
+      }
+
+      function startAutoSave() {
+        autoSaveHandle = setInterval(() => {
+          if (!isSubmitted) {
+            saveAnswers(collect()).catch((error) => showSaveStatus(error.message, "error"));
+          }
+        }, 10000);
+      }
+
+      document.addEventListener("input", () => {
+        isDirty = true;
+        if (typeof window.markAnswered === "function") window.markAnswered();
+      });
+      document.addEventListener("change", () => {
+        isDirty = true;
+        if (typeof window.markAnswered === "function") window.markAnswered();
+      });
+
+      window.addEventListener("beforeunload", (event) => {
+        if (!isSubmitted && isDirty) {
+          event.preventDefault();
+          event.returnValue = "";
+        }
+      });
+
+      window.IELTSPracticeBridge = {
+        attemptId,
+        existingAnswers,
+        existingHighlights,
+        existingNotes,
+        collectAnswers: collect,
+        collectHighlights,
+        collectNotes,
+        saveAnswers,
+        submitAnswers,
+        calculateTimeSpent,
+        markDirty: () => {
+          isDirty = true;
+        },
+      };
+
+      if (typeof window.collectAnswers !== "function") window.collectAnswers = defaultCollectAnswers;
+      if (typeof window.collectHighlights !== "function") window.collectHighlights = defaultCollectHighlights;
+      if (typeof window.collectNotes !== "function") window.collectNotes = defaultCollectNotes;
+      if (typeof window.autoSaveAnswers !== "function") window.autoSaveAnswers = () => saveAnswers(collect());
+      if (typeof window.submitIELTSPractice !== "function") {
+        window.submitIELTSPractice = () => {
+          if (window.confirm("Submit this attempt? You cannot edit answers after submission.")) {
+            return submitAnswers(collect(), calculateTimeSpent());
+          }
+          return Promise.resolve();
+        };
+      }
+      if (typeof window.calculateTimeSpent !== "function") window.calculateTimeSpent = calculateTimeSpent;
+      if (typeof window.showWarningBeforeLeave !== "function") {
+        window.showWarningBeforeLeave = () => {
+          isDirty = true;
+        };
+      }
+      if (typeof window.scrollToQuestion !== "function") {
+        window.scrollToQuestion = (questionNumber) => {
+          const target = document.querySelector(`[data-question-block="${CSS.escape(String(questionNumber))}"]`);
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+      }
+      if (typeof window.markAnswered !== "function") window.markAnswered = function () {};
+
+      restoreAnswers();
+      restoreAnnotations();
+      startTimer();
+      startAutoSave();
+      document.dispatchEvent(new CustomEvent("ielts:bridge-ready", { detail: window.IELTSPracticeBridge }));
+    })();
+  </script>
+{% endblock %}

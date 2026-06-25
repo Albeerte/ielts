@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}IELTS Practice Tests{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>IELTS Practice</h1>
+    <p class="muted" style="margin:0;">Reading, Listening, Writing, Dictation, Articles, Podcasts, and full mocks.</p>
+  </div>
+  <div class="action-row">
+    <a class="button secondary" href="{% url 'practice:dictation_list' %}">Dictation</a>
+    <a class="button secondary" href="{% url 'practice:article_list' %}">Articles</a>
+    <a class="button secondary" href="{% url 'practice:podcast_list' %}">Podcasts</a>
+    <a class="button secondary" href="{% url 'practice:mock_list' %}">Full mocks</a>
+  </div>
+</section>
+
+<section class="filter-row" style="margin-bottom:18px;">
+  <a class="button {% if not selected_skill %}secondary{% endif %}" href="{% url 'practice:test_list' %}">All</a>
+  {% for value, label in skills %}
+    <a class="button {% if selected_skill == value %}{% else %}secondary{% endif %}" href="?skill={{ value }}">{{ label }}</a>
+  {% endfor %}
+</section>
+
+<section class="test-grid">
+  {% for item in cards %}
+    <article class="card test-card">
+      <div>
+        <span class="badge">{{ item.test.get_skill_display }} · {{ item.test.get_section_type_display }}</span>
+        <h2 style="font-size:20px; margin:10px 0 4px;">{{ item.test.title }}</h2>
+        <p class="muted" style="margin:0;">{{ item.test.duration_minutes }} minutes{% if item.test.audio_file %} · Audio{% endif %}</p>
+      </div>
+      {% if item.latest_attempt %}
+        <p class="muted" style="margin:0;">
+          Last attempt:
+          {% if item.latest_attempt.is_submitted %}
+            {{ item.latest_attempt.score }}/{{ item.latest_attempt.total_questions }}
+          {% else %}
+            in progress
+          {% endif %}
+        </p>
+      {% endif %}
+      <div class="action-row" style="margin-top:auto;">
+        <a class="button" href="{{ item.test.get_absolute_url }}">Open</a>
+        <a class="button secondary" href="{% url 'practice:start_test_attempt' item.test.slug %}">Start</a>
+      </div>
+    </article>
+  {% empty %}
+    <div class="card" style="padding:24px;">
+      <h2 style="margin-top:0;">No published tests yet</h2>
+      <p class="muted">A teacher can publish tests from the Teacher Panel.</p>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

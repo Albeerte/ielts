@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Practice Tasks | IELTS Practice{% endblock %}
+
+{% block content %}
+  <section style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:22px;">
+    <div>
+      <h1 style="margin:0 0 6px;">Practice Tasks</h1>
+      <p class="muted" style="margin:0;">Choose a test section and continue or start a fresh attempt.</p>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a class="button secondary" href="{% url 'practice:task_list' %}">All</a>
+      {% for value, label in test_types %}
+        <a class="button {% if selected_type == value %}{% else %}secondary{% endif %}" href="?type={{ value }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+    {% for item in task_cards %}
+      <article class="card" style="padding:18px; display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <div class="muted" style="font-size:13px; font-weight:700; text-transform:uppercase;">
+            {{ item.task.get_test_type_display }} · Section {{ item.task.section_number }}
+          </div>
+          <h2 style="font-size:20px; margin:6px 0 4px;">{{ item.task.title }}</h2>
+          <p class="muted" style="margin:0;">{{ item.task.duration_minutes }} minutes</p>
+        </div>
+        {% if item.latest_attempt %}
+          <div class="muted" style="font-size:14px;">
+            Last attempt:
+            {% if item.latest_attempt.is_submitted %}
+              {{ item.latest_attempt.score }}/{{ item.latest_attempt.total_questions }}
+            {% else %}
+              in progress
+            {% endif %}
+          </div>
+        {% endif %}
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:auto;">
+          {% if item.latest_attempt and not item.latest_attempt.is_submitted %}
+            <a class="button" href="{{ item.task.get_absolute_url }}?attempt={{ item.latest_attempt.id }}">Continue</a>
+          {% else %}
+            <a class="button" href="{% url 'practice:start_attempt' item.task.slug %}">Start</a>
+          {% endif %}
+          <a class="button secondary" href="{% url 'practice:start_attempt' item.task.slug %}">New attempt</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">No active tasks yet</h2>
+        <p class="muted" style="margin-bottom:0;">Create one in Django Admin and mark it active.</p>
+      </div>
+    {% endfor %}
+  </section>
+{% endblock %}

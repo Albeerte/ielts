@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Teacher Dashboard</h1>
+    <p class="muted" style="margin:0;">Create, preview, edit, publish, and delete IELTS practice content.</p>
+  </div>
+  <div class="action-row">
+    <a class="button" href="{% url 'practice:teacher_test_create' %}">Create test</a>
+    <a class="button secondary" href="{% url 'practice:teacher_article_create' %}">Create article</a>
+    <a class="button secondary" href="{% url 'practice:teacher_dictation_create' %}">Create dictation</a>
+    <a class="button secondary" href="{% url 'practice:teacher_mock_create' %}">Create full mock</a>
+    <a class="button secondary" href="{% url 'practice:teacher_tests' %}">All tests</a>
+  </div>
+</section>
+
+<section class="test-grid" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom:20px;">
+  <div class="card" style="padding:18px;"><div class="muted">Tests</div><strong style="font-size:32px;">{{ test_count }}</strong></div>
+  <div class="card" style="padding:18px;"><div class="muted">Published</div><strong style="font-size:32px;">{{ published_count }}</strong></div>
+  <div class="card" style="padding:18px;"><div class="muted">Attempts</div><strong style="font-size:32px;">{{ attempt_count }}</strong></div>
+</section>
+
+<section class="card" style="padding:18px; margin-bottom:20px;">
+  <h2 style="margin-top:0;">Recent tests</h2>
+  <table class="teacher-table">
+    <tr><th>Title</th><th>Skill</th><th>Status</th><th>Actions</th></tr>
+    {% for test in tests %}
+      <tr>
+        <td>{{ test.title }}</td>
+        <td>{{ test.get_skill_display }} · {{ test.get_section_type_display }}</td>
+        <td>{% if test.is_published %}Published{% else %}Draft{% endif %}</td>
+        <td class="action-row">
+          <a href="{% url 'practice:teacher_test_preview' test.id %}">Preview</a>
+          <a href="{% url 'practice:teacher_test_edit' test.id %}">Edit</a>
+          <a href="{% url 'practice:teacher_test_delete' test.id %}">Delete</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">No tests yet.</td></tr>
+    {% endfor %}
+  </table>
+</section>
+
+<section class="card" style="padding:18px;">
+  <h2 style="margin-top:0;">Recent attempts</h2>
+  <table class="teacher-table">
+    <tr><th>Student</th><th>Test</th><th>Score</th><th>Status</th></tr>
+    {% for attempt in attempts %}
+      <tr>
+        <td>{{ attempt.user }}</td>
+        <td>{{ attempt.test.title }}</td>
+        <td>{% if attempt.score is not None %}{{ attempt.score }}/{{ attempt.total_questions }}{% else %}-{% endif %}</td>
+        <td>{% if attempt.is_submitted %}Submitted{% else %}In progress{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">No attempts yet.</td></tr>
+    {% endfor %}
+  </table>
+</section>
+{% endblock %}

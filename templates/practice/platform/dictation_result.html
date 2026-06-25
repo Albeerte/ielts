@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Dictation Result{% endblock %}
+
+{% block content %}
+<section class="card" style="padding:24px; max-width:900px; margin:28px auto;">
+  <span class="badge">Dictation result</span>
+  <h1>{{ attempt.exercise.title }}</h1>
+  <div class="card" style="padding:16px; margin:14px 0;">
+    <div class="muted">Accuracy</div>
+    <strong style="font-size:34px;">{{ attempt.accuracy_percent }}%</strong>
+  </div>
+  <h2>Your text</h2>
+  <pre style="white-space:pre-wrap; background:#f8fafc; border:1px solid #d8e0ec; border-radius:8px; padding:14px;">{{ attempt.submitted_text }}</pre>
+  <h2>Transcript</h2>
+  <pre style="white-space:pre-wrap; background:#f8fafc; border:1px solid #d8e0ec; border-radius:8px; padding:14px;">{{ attempt.exercise.transcript }}</pre>
+  {% if attempt.mistakes %}
+    <h2>Mistakes</h2>
+    <table class="mistake-table">
+      <tr><th>#</th><th>Expected</th><th>Your word</th></tr>
+      {% for mistake in attempt.mistakes %}
+        <tr><td>{{ mistake.position }}</td><td>{{ mistake.expected }}</td><td>{{ mistake.actual }}</td></tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+  <div class="action-row" style="margin-top:16px;">
+    <a class="button" href="{% url 'practice:start_dictation' attempt.exercise.slug %}">Try again</a>
+    <a class="button secondary" href="{% url 'practice:dictation_list' %}">Back</a>
+  </div>
+</section>
+{% endblock %}

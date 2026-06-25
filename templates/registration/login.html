@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Log in | IELTS Practice{% endblock %}
+
+{% block content %}
+  <section class="card" style="max-width: 420px; margin: 48px auto; padding: 24px;">
+    <h1 style="margin: 0 0 8px;">Log in</h1>
+    <p class="muted" style="margin-top: 0;">Use your student or teacher account.</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <label style="display:block; margin-bottom: 12px;">
+        <span style="display:block; font-weight:700; margin-bottom:4px;">Username</span>
+        {{ form.username }}
+      </label>
+      <label style="display:block; margin-bottom: 16px;">
+        <span style="display:block; font-weight:700; margin-bottom:4px;">Password</span>
+        {{ form.password }}
+      </label>
+      <button class="button" type="submit">Log in</button>
+    </form>
+  </section>
+{% endblock %}

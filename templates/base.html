@@ -1,0 +1,184 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}IELTS Practice{% endblock %}</title>
+  <style>
+    :root {
+      --page-bg: #f4f7fb;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #d8e0ec;
+      --blue: #1d4ed8;
+      --blue-dark: #1e3a8a;
+      --green: #15803d;
+      --red: #b91c1c;
+      --card: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .site-header-inner {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 58px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--ink);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 28px auto;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:hover {
+      background: var(--blue-dark);
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: #ffffff;
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .button.secondary:hover {
+      background: #eef4ff;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .messages {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .message {
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    @media (max-width: 700px) {
+      .site-header-inner,
+      .page-shell {
+        width: min(100% - 20px, 1180px);
+      }
+
+      .site-header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 0;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="{% static 'practice/platform.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="{% if request.user.is_authenticated %}{% url 'practice:test_list' %}{% else %}{% url 'landing' %}{% endif %}">IELTS Practice Platform</a>
+      <nav class="nav-actions">
+        {% if request.user.is_authenticated %}
+          <span>{{ request.user.get_username }}</span>
+          {% if request.user.is_staff %}
+            <a href="{% url 'practice:teacher_dashboard' %}">Teacher</a>
+            <a href="{% url 'admin:index' %}">Admin</a>
+          {% endif %}
+          <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button class="button secondary" type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Log in</a>
+          <a class="button" href="{% url 'login' %}">Enter platform</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="{% block main_class %}page-shell{% endblock %}">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

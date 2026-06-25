@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Result | {{ attempt.test.title }}{% endblock %}
+
+{% block content %}
+<section class="card" style="padding:24px; max-width:900px; margin:34px auto;">
+  <span class="badge">{{ attempt.test.get_skill_display }} · {{ attempt.test.get_section_type_display }}</span>
+  <h1 style="margin:10px 0;">{{ attempt.test.title }}</h1>
+  <div class="test-grid" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));">
+    <div class="card" style="padding:16px;"><div class="muted">Score</div><strong style="font-size:30px;">{{ attempt.score }}/{{ attempt.total_questions }}</strong></div>
+    <div class="card" style="padding:16px;"><div class="muted">Time</div><strong style="font-size:30px;">{{ attempt.time_spent_seconds }}s</strong></div>
+    <div class="card" style="padding:16px;"><div class="muted">Status</div><strong>{% if attempt.is_locked %}Locked{% else %}Open{% endif %}</strong></div>
+  </div>
+
+  <h2>Mistakes</h2>
+  {% if attempt.mistakes %}
+    <table class="mistake-table">
+      <tr><th>Question</th><th>Your answer</th><th>Correct answer</th></tr>
+      {% for number, mistake in attempt.mistakes.items %}
+        <tr><td>{{ number }}</td><td>{{ mistake.actual }}</td><td>{{ mistake.expected }}</td></tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p class="muted">No mistakes found, or this task has no answer key.</p>
+  {% endif %}
+
+  <h2>Highlights</h2>
+  {% if highlights %}
+    <ul>{% for highlight in highlights %}<li>{{ highlight.selected_text }}</li>{% endfor %}</ul>
+  {% else %}
+    <p class="muted">No highlights saved.</p>
+  {% endif %}
+
+  <h2>Notes</h2>
+  {% if attempt.notes %}
+    <ul>{% for note in attempt.notes %}<li>{{ note.text }}</li>{% endfor %}</ul>
+  {% else %}
+    <p class="muted">No notes saved.</p>
+  {% endif %}
+
+  <div class="action-row">
+    <a class="button" href="{% url 'practice:start_test_attempt' attempt.test.slug %}">Start again</a>
+    <a class="button secondary" href="{% url 'practice:test_list' %}">Back to tests</a>
+  </div>
+</section>
+{% endblock %}

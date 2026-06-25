@@ -1,0 +1,105 @@
+<div class="ielts-platform-sample">
+  <style>
+    .ielts-platform-sample {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #172033;
+    }
+
+    .ielts-platform-sample .listening-card {
+      border: 1px solid #d8e0ec;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 18px;
+    }
+
+    .ielts-platform-sample .question-card {
+      margin: 12px 0;
+      padding: 12px;
+      border: 1px solid #d8e0ec;
+      border-radius: 8px;
+      scroll-margin-top: 130px;
+    }
+
+    .ielts-platform-sample input[type="text"] {
+      min-height: 36px;
+      border: 1px solid #b9c6d8;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .ielts-platform-sample label {
+      display: block;
+      margin: 7px 0;
+      padding: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .ielts-platform-sample label.selected {
+      border-color: #1d4ed8;
+      background: #eff6ff;
+    }
+
+    .ielts-platform-sample .navigator {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .ielts-platform-sample .navigator button {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #d8e0ec;
+      border-radius: 6px;
+      background: #ffffff;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .ielts-platform-sample .navigator button.answered {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #ffffff;
+    }
+  </style>
+
+  <section class="listening-card">
+    <h2>Listening Part 1: Library Membership</h2>
+    <p>Listen to the audio and answer questions 1-6.</p>
+    <div class="navigator">
+      <button type="button" data-nav="1">1</button>
+      <button type="button" data-nav="2">2</button>
+      <button type="button" data-nav="3">3</button>
+      <button type="button" data-nav="4">4</button>
+      <button type="button" data-nav="5">5</button>
+      <button type="button" data-nav="6">6</button>
+    </div>
+
+    <div class="question-card" data-question-block="1">
+      <p>1. Applicant's surname: <input type="text" name="1" data-question="1"></p>
+    </div>
+    <div class="question-card" data-question-block="2">
+      <p>2. Membership type: <input type="text" name="2" data-question="2"></p>
+    </div>
+    <div class="question-card" data-question-block="3">
+      <p>3. Maximum number of books: <input type="text" name="3" data-question="3"></p>
+    </div>
+    <div class="question-card" data-question-block="4">
+      <p>4. The library closes at</p>
+      <label><input type="radio" name="4" data-question="4" value="A"> A. 6:00</label>
+      <label><input type="radio" name="4" data-question="4" value="B"> B. 7:30</label>
+      <label><input type="radio" name="4" data-question="4" value="C"> C. 8:00</label>
+    </div>
+    <div class="question-card" data-question-block="5">
+      <p>5. The computer room is on the <input type="text" name="5" data-question="5"> floor.</p>
+    </div>
+    <div class="question-card" data-question-block="6">
+      <p>6. New members receive a map by</p>
+      <label><input type="radio" name="6" data-question="6" value="A"> A. email</label>
+      <label><input type="radio" name="6" data-question="6" value="B"> B. post</label>
+      <label><input type="radio" name="6" data-question="6" value="C"> C. text message</label>
+    </div>
+  </section>
+</div>

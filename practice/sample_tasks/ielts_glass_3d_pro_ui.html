@@ -1,0 +1,927 @@
+<div class="ielts-glass-pro" data-ielts-glass-pro>
+  <style>
+    /* IELTS Glass 3D Pro UI - self-contained upload-ready task */
+    .ielts-glass-pro {
+      --bg-0: #06111f;
+      --bg-1: #0b1f36;
+      --panel: rgba(255, 255, 255, 0.12);
+      --panel-strong: rgba(255, 255, 255, 0.18);
+      --line: rgba(255, 255, 255, 0.24);
+      --text: #f7fbff;
+      --muted: #b8c7d9;
+      --cyan: #22d3ee;
+      --blue: #3b82f6;
+      --violet: #8b5cf6;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --red: #fb7185;
+      --shadow: rgba(0, 0, 0, 0.35);
+      min-height: 100vh;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.28), transparent 30%),
+        radial-gradient(circle at 82% 20%, rgba(139, 92, 246, 0.28), transparent 28%),
+        linear-gradient(135deg, var(--bg-0), var(--bg-1) 52%, #111827);
+      color: var(--text);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      line-height: 1.55;
+      overflow: hidden;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .ielts-glass-pro * {
+      box-sizing: border-box;
+    }
+
+    .ielts-glass-pro button,
+    .ielts-glass-pro input,
+    .ielts-glass-pro select,
+    .ielts-glass-pro textarea {
+      font: inherit;
+    }
+
+    .ielts-glass-pro::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      z-index: -3;
+      background:
+        linear-gradient(115deg, transparent 0 30%, rgba(34, 211, 238, 0.12) 42%, transparent 54%),
+        linear-gradient(245deg, transparent 0 28%, rgba(139, 92, 246, 0.13) 44%, transparent 58%);
+      animation: ieltsLightSweep 18s linear infinite;
+    }
+
+    .ielts-glass-pro .scene {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      perspective: 1000px;
+      overflow: hidden;
+    }
+
+    .ielts-glass-pro .float-card {
+      position: absolute;
+      width: 160px;
+      height: 104px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(18px);
+      transform-style: preserve-3d;
+      animation: ieltsFloat 12s ease-in-out infinite;
+    }
+
+    .ielts-glass-pro .float-card::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      transform: translateZ(22px);
+    }
+
+    .ielts-glass-pro .float-card.one {
+      left: 4%;
+      top: 12%;
+      animation-delay: -2s;
+    }
+
+    .ielts-glass-pro .float-card.two {
+      right: 5%;
+      top: 26%;
+      width: 130px;
+      height: 86px;
+      animation-delay: -6s;
+    }
+
+    .ielts-glass-pro .float-card.three {
+      left: 10%;
+      bottom: 8%;
+      width: 190px;
+      height: 116px;
+      animation-delay: -9s;
+    }
+
+    .ielts-glass-pro .shell {
+      max-width: 1380px;
+      margin: 0 auto;
+      animation: ieltsPageIn 650ms ease both;
+    }
+
+    .ielts-glass-pro .glass {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
+      box-shadow: 0 22px 70px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+
+    .ielts-glass-pro .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 18px;
+    }
+
+    .ielts-glass-pro .title-block h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .ielts-glass-pro .title-block p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .ielts-glass-pro .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .ielts-glass-pro .timer,
+    .ielts-glass-pro .progress-badge {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      font-weight: 800;
+    }
+
+    .ielts-glass-pro .timer[data-warning="true"] {
+      color: var(--red);
+      border-color: rgba(251, 113, 133, 0.45);
+    }
+
+    .ielts-glass-pro .btn {
+      min-height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 14px;
+      padding: 9px 14px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.28), rgba(59, 130, 246, 0.22));
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(34, 211, 238, 0.12);
+      transform: translateZ(0);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .ielts-glass-pro .btn:hover,
+    .ielts-glass-pro .btn:focus-visible {
+      transform: translateY(-2px) translateZ(12px);
+      border-color: rgba(34, 211, 238, 0.62);
+      box-shadow: 0 18px 36px rgba(34, 211, 238, 0.22);
+      outline: none;
+    }
+
+    .ielts-glass-pro .btn.secondary {
+      background: rgba(255, 255, 255, 0.11);
+      box-shadow: none;
+    }
+
+    .ielts-glass-pro .progress-track {
+      grid-column: 1 / -1;
+      height: 9px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .ielts-glass-pro .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--violet), var(--emerald));
+      box-shadow: 0 0 22px rgba(34, 211, 238, 0.5);
+      transition: width 260ms ease;
+    }
+
+    .ielts-glass-pro .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .ielts-glass-pro .passage-card,
+    .ielts-glass-pro .question-card {
+      border-radius: 22px;
+      transform-style: preserve-3d;
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+
+    .ielts-glass-pro .passage-card:hover,
+    .ielts-glass-pro .question-card:hover {
+      border-color: rgba(34, 211, 238, 0.42);
+    }
+
+    .ielts-glass-pro .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .ielts-glass-pro .panel-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .ielts-glass-pro .pill {
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #dff9ff;
+      background: rgba(34, 211, 238, 0.16);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .ielts-glass-pro .passage-body {
+      max-height: calc(100vh - 210px);
+      overflow: auto;
+      padding: 18px 20px 22px;
+      color: #e8f2ff;
+      font-size: 16px;
+    }
+
+    .ielts-glass-pro .passage-body p {
+      margin: 0 0 16px;
+    }
+
+    .ielts-glass-pro .passage-body strong {
+      color: var(--cyan);
+    }
+
+    .ielts-glass-pro .questions-panel {
+      position: sticky;
+      top: 104px;
+      border-radius: 22px;
+    }
+
+    .ielts-glass-pro .question-stack {
+      max-height: calc(100vh - 210px);
+      overflow: auto;
+      padding: 16px;
+    }
+
+    .ielts-glass-pro .question-card {
+      display: none;
+      padding: 18px;
+      min-height: 360px;
+      animation: ieltsQuestionIn 260ms ease both;
+    }
+
+    .ielts-glass-pro .question-card.active {
+      display: block;
+    }
+
+    .ielts-glass-pro .question-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .ielts-glass-pro .instruction {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .ielts-glass-pro .answer-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .ielts-glass-pro .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .ielts-glass-pro .option:hover,
+    .ielts-glass-pro .option.selected {
+      transform: translateY(-1px);
+      background: rgba(34, 211, 238, 0.13);
+      border-color: rgba(34, 211, 238, 0.42);
+    }
+
+    .ielts-glass-pro .text-answer,
+    .ielts-glass-pro .select-answer {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .ielts-glass-pro .text-answer:focus,
+    .ielts-glass-pro .select-answer:focus {
+      border-color: rgba(34, 211, 238, 0.7);
+      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .ielts-glass-pro .select-answer option {
+      color: #0f172a;
+    }
+
+    .ielts-glass-pro .review-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .ielts-glass-pro .review-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .ielts-glass-pro .bottom-nav {
+      position: sticky;
+      bottom: 12px;
+      z-index: 18;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 20px;
+    }
+
+    .ielts-glass-pro .question-buttons {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 4px;
+      justify-content: center;
+    }
+
+    .ielts-glass-pro .qbtn {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--text);
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .ielts-glass-pro .qbtn:hover,
+    .ielts-glass-pro .qbtn.active {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.55);
+      background: rgba(34, 211, 238, 0.18);
+    }
+
+    .ielts-glass-pro .qbtn.answered {
+      background: rgba(52, 211, 153, 0.2);
+      border-color: rgba(52, 211, 153, 0.5);
+    }
+
+    .ielts-glass-pro .qbtn.review {
+      background: rgba(251, 191, 36, 0.2);
+      border-color: rgba(251, 191, 36, 0.55);
+      color: #fff7d6;
+    }
+
+    .ielts-glass-pro .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(2, 6, 23, 0.68);
+      backdrop-filter: blur(12px);
+    }
+
+    .ielts-glass-pro .modal-backdrop.active {
+      display: flex;
+    }
+
+    .ielts-glass-pro .modal {
+      width: min(560px, 100%);
+      border-radius: 24px;
+      padding: 24px;
+      animation: ieltsModalIn 260ms ease both;
+    }
+
+    .ielts-glass-pro .modal h2 {
+      margin: 0 0 8px;
+    }
+
+    .ielts-glass-pro .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .ielts-glass-pro .summary-tile {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .ielts-glass-pro .summary-tile span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .ielts-glass-pro .summary-tile strong {
+      font-size: 28px;
+    }
+
+    .ielts-glass-pro .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ielts-glass-pro ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    .ielts-glass-pro ::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    @keyframes ieltsLightSweep {
+      0% { transform: translate3d(-4%, -2%, 0) rotate(0deg); }
+      50% { transform: translate3d(4%, 2%, 0) rotate(8deg); }
+      100% { transform: translate3d(-4%, -2%, 0) rotate(0deg); }
+    }
+
+    @keyframes ieltsFloat {
+      0%, 100% { transform: translate3d(0, 0, -40px) rotateX(10deg) rotateY(-18deg); }
+      50% { transform: translate3d(18px, -24px, 40px) rotateX(-8deg) rotateY(16deg); }
+    }
+
+    @keyframes ieltsPageIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes ieltsQuestionIn {
+      from { opacity: 0; transform: translateX(14px) rotateY(-4deg); }
+      to { opacity: 1; transform: translateX(0) rotateY(0); }
+    }
+
+    @keyframes ieltsModalIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 980px) {
+      .ielts-glass-pro {
+        padding: 12px;
+      }
+
+      .ielts-glass-pro .topbar,
+      .ielts-glass-pro .layout,
+      .ielts-glass-pro .bottom-nav {
+        grid-template-columns: 1fr;
+      }
+
+      .ielts-glass-pro .questions-panel {
+        position: static;
+      }
+
+      .ielts-glass-pro .passage-body,
+      .ielts-glass-pro .question-stack {
+        max-height: none;
+      }
+
+      .ielts-glass-pro .top-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .ielts-glass-pro .title-block h1 {
+        font-size: 20px;
+      }
+
+      .ielts-glass-pro .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ielts-glass-pro .btn {
+        width: 100%;
+      }
+
+      .ielts-glass-pro .bottom-nav .btn {
+        width: auto;
+      }
+    }
+  </style>
+
+  <div class="scene" aria-hidden="true">
+    <div class="float-card one"></div>
+    <div class="float-card two"></div>
+    <div class="float-card three"></div>
+  </div>
+
+  <div class="shell">
+    <!-- Header: edit title, duration, and submit behavior in the script config below -->
+    <header class="topbar glass" data-tilt-card>
+      <div class="title-block">
+        <h1>IELTS Practice Test</h1>
+        <p>The Future of Artificial Intelligence in Education</p>
+      </div>
+      <div class="top-actions">
+        <span class="timer" data-timer>30:00</span>
+        <span class="progress-badge"><span data-progress-text>0%</span> complete</span>
+        <button type="button" class="btn" data-submit>Submit</button>
+      </div>
+      <div class="progress-track" aria-label="Answered progress">
+        <div class="progress-fill" data-progress-fill></div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- Passage: replace this section for Reading, Listening transcript, Writing task, or Speaking prompt -->
+      <article class="passage-card glass" data-tilt-card>
+        <div class="panel-header">
+          <h2>The Future of Artificial Intelligence in Education</h2>
+          <span class="pill">Reading Passage</span>
+        </div>
+        <div class="passage-body">
+          <p><strong>A</strong> Artificial intelligence is becoming a familiar presence in education. In many schools and universities, software can now recommend exercises, check simple answers, and identify topics that students may need to review. Supporters argue that these tools can help teachers respond to learners more quickly and with greater precision.</p>
+          <p><strong>B</strong> One of the most common uses of AI is adaptive learning. Instead of giving every student the same sequence of tasks, an adaptive platform changes the level and order of activities according to the learner's performance. A student who answers vocabulary questions easily may move on to more complex reading tasks, while another student may receive extra practice first.</p>
+          <p><strong>C</strong> However, researchers warn that AI should not replace teachers. Human teachers notice motivation, confidence, classroom behaviour, and emotional needs in ways that data systems often cannot. For this reason, many experts believe the best future classroom will combine intelligent software with professional human judgement.</p>
+          <p><strong>D</strong> Privacy is another important issue. Educational platforms may collect information about mistakes, study habits, and even the speed at which a student reads or types. Schools must decide who can access this information and how long it should be stored. Without clear rules, useful learning data can become a source of risk.</p>
+          <p><strong>E</strong> Despite these concerns, AI may make education more accessible. Automated captions, speech recognition, and translation tools can support students who previously found lessons difficult to follow. If used carefully, artificial intelligence may not make learning less human; it may give teachers more time for the human parts of teaching.</p>
+        </div>
+      </article>
+
+      <!-- Questions: keep data-question numbers for Django answer collection -->
+      <section class="questions-panel glass" aria-label="Questions">
+        <div class="panel-header">
+          <h2>Questions 1-10</h2>
+          <span class="pill" data-status-text>0 answered</span>
+        </div>
+        <div class="question-stack">
+          <section class="question-card glass active" data-question-card data-question-block="1">
+            <h3>Question 1</h3>
+            <p class="instruction">Choose TRUE, FALSE, or NOT GIVEN.</p>
+            <p>AI tools are already used in some educational institutions.</p>
+            <div class="answer-list">
+              <label class="option"><input type="radio" name="1" data-question="1" value="TRUE"> TRUE</label>
+              <label class="option"><input type="radio" name="1" data-question="1" value="FALSE"> FALSE</label>
+              <label class="option"><input type="radio" name="1" data-question="1" value="NOT GIVEN"> NOT GIVEN</label>
+            </div>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="1"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="2">
+            <h3>Question 2</h3>
+            <p class="instruction">Choose TRUE, FALSE, or NOT GIVEN.</p>
+            <p>Adaptive platforms always give every student the same tasks.</p>
+            <div class="answer-list">
+              <label class="option"><input type="radio" name="2" data-question="2" value="TRUE"> TRUE</label>
+              <label class="option"><input type="radio" name="2" data-question="2" value="FALSE"> FALSE</label>
+              <label class="option"><input type="radio" name="2" data-question="2" value="NOT GIVEN"> NOT GIVEN</label>
+            </div>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="2"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="3">
+            <h3>Question 3</h3>
+            <p class="instruction">Choose TRUE, FALSE, or NOT GIVEN.</p>
+            <p>Most students prefer AI feedback to teacher feedback.</p>
+            <div class="answer-list">
+              <label class="option"><input type="radio" name="3" data-question="3" value="TRUE"> TRUE</label>
+              <label class="option"><input type="radio" name="3" data-question="3" value="FALSE"> FALSE</label>
+              <label class="option"><input type="radio" name="3" data-question="3" value="NOT GIVEN"> NOT GIVEN</label>
+            </div>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="3"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="4">
+            <h3>Question 4</h3>
+            <p class="instruction">Complete the sentence with NO MORE THAN TWO WORDS.</p>
+            <label>AI can identify topics students may need to <input class="text-answer" type="text" name="4" data-question="4" autocomplete="off"></label>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="4"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="5">
+            <h3>Question 5</h3>
+            <p class="instruction">Complete the sentence with NO MORE THAN TWO WORDS.</p>
+            <label>Adaptive learning changes activities according to the learner's <input class="text-answer" type="text" name="5" data-question="5" autocomplete="off"></label>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="5"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="6">
+            <h3>Question 6</h3>
+            <p class="instruction">Complete the sentence with NO MORE THAN TWO WORDS.</p>
+            <label>Experts say AI should be combined with human <input class="text-answer" type="text" name="6" data-question="6" autocomplete="off"></label>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="6"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="7">
+            <h3>Question 7</h3>
+            <p class="instruction">Choose the correct answer.</p>
+            <p>According to paragraph D, what may educational platforms collect?</p>
+            <div class="answer-list">
+              <label class="option"><input type="radio" name="7" data-question="7" value="A"> A. School building plans</label>
+              <label class="option"><input type="radio" name="7" data-question="7" value="B"> B. Study habits and mistakes</label>
+              <label class="option"><input type="radio" name="7" data-question="7" value="C"> C. Teachers' salaries</label>
+              <label class="option"><input type="radio" name="7" data-question="7" value="D"> D. Classroom furniture lists</label>
+            </div>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="7"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="8">
+            <h3>Question 8</h3>
+            <p class="instruction">Choose the correct answer.</p>
+            <p>Which tools can support students who find lessons difficult to follow?</p>
+            <div class="answer-list">
+              <label class="option"><input type="radio" name="8" data-question="8" value="A"> A. Automated captions and speech recognition</label>
+              <label class="option"><input type="radio" name="8" data-question="8" value="B"> B. Paper-only exams</label>
+              <label class="option"><input type="radio" name="8" data-question="8" value="C"> C. Longer school holidays</label>
+              <label class="option"><input type="radio" name="8" data-question="8" value="D"> D. Fewer reading tasks</label>
+            </div>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="8"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="9">
+            <h3>Question 9</h3>
+            <p class="instruction">Answer with ONE OR TWO WORDS.</p>
+            <label>What type of learning gives students different tasks based on their level? <input class="text-answer" type="text" name="9" data-question="9" autocomplete="off"></label>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="9"> Mark for review</label></div>
+          </section>
+
+          <section class="question-card glass" data-question-card data-question-block="10">
+            <h3>Question 10</h3>
+            <p class="instruction">Answer with ONE OR TWO WORDS.</p>
+            <label>What issue is discussed in paragraph D? <input class="text-answer" type="text" name="10" data-question="10" autocomplete="off"></label>
+            <div class="review-row"><label class="review-toggle"><input type="checkbox" data-review="10"> Mark for review</label></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav glass" aria-label="Question navigation">
+      <button type="button" class="btn secondary" data-prev>Previous</button>
+      <div class="question-buttons" data-question-buttons></div>
+      <button type="button" class="btn secondary" data-next>Next</button>
+    </nav>
+  </div>
+
+  <div class="modal-backdrop" data-modal>
+    <section class="modal glass" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <h2 id="resultTitle">Submission Summary</h2>
+      <p class="instruction">Review your status before final submission.</p>
+      <div class="summary-grid">
+        <div class="summary-tile"><span>Total questions</span><strong data-total>10</strong></div>
+        <div class="summary-tile"><span>Answered</span><strong data-answered>0</strong></div>
+        <div class="summary-tile"><span>Unanswered</span><strong data-unanswered>10</strong></div>
+        <div class="summary-tile"><span>Marked review</span><strong data-review-count>0</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" data-close-modal>Continue editing</button>
+        <button type="button" class="btn" data-confirm-submit>Confirm submit</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.querySelector(".ielts-glass-pro");
+      const durationMinutes = 30;
+      const totalQuestions = 10;
+      const storageKey = "ielts-glass-3d-pro-ai-education";
+      const cards = Array.from(root.querySelectorAll("[data-question-card]"));
+      const buttonsWrap = root.querySelector("[data-question-buttons]");
+      const progressFill = root.querySelector("[data-progress-fill]");
+      const progressText = root.querySelector("[data-progress-text]");
+      const statusText = root.querySelector("[data-status-text]");
+      const timer = root.querySelector("[data-timer]");
+      const modal = root.querySelector("[data-modal]");
+      const startedAt = Date.now();
+      let activeIndex = 0;
+      let submitted = false;
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      function collectAnswers() {
+        const answers = {};
+        root.querySelectorAll("[data-question]").forEach((field) => {
+          const question = field.dataset.question;
+          if (field.type === "radio") {
+            if (field.checked) answers[question] = field.value;
+            return;
+          }
+          const value = field.value.trim();
+          if (value) answers[question] = value;
+        });
+        return answers;
+      }
+
+      function collectReview() {
+        return Array.from(root.querySelectorAll("[data-review]:checked")).map((field) => field.dataset.review);
+      }
+
+      function saveLocal() {
+        localStorage.setItem(storageKey, JSON.stringify({ answers: collectAnswers(), review: collectReview() }));
+      }
+
+      function restoreLocal() {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        Object.entries(saved.answers || {}).forEach(([question, value]) => {
+          root.querySelectorAll(`[data-question="${CSS.escape(question)}"]`).forEach((field) => {
+            if (field.type === "radio") field.checked = field.value === value;
+            else field.value = value;
+          });
+        });
+        (saved.review || []).forEach((question) => {
+          const box = root.querySelector(`[data-review="${CSS.escape(question)}"]`);
+          if (box) box.checked = true;
+        });
+      }
+
+      function setActiveQuestion(index) {
+        activeIndex = Math.max(0, Math.min(index, cards.length - 1));
+        cards.forEach((card, cardIndex) => card.classList.toggle("active", cardIndex === activeIndex));
+        updateStatus();
+      }
+
+      function updateStatus() {
+        const answers = collectAnswers();
+        const review = collectReview();
+        const answeredCount = Object.keys(answers).length;
+        const percent = Math.round((answeredCount / totalQuestions) * 100);
+        progressFill.style.width = percent + "%";
+        progressText.textContent = percent + "%";
+        statusText.textContent = answeredCount + " answered";
+
+        root.querySelectorAll(".option").forEach((label) => {
+          const input = label.querySelector("input");
+          label.classList.toggle("selected", Boolean(input && input.checked));
+        });
+
+        root.querySelectorAll(".qbtn").forEach((button, index) => {
+          const question = String(index + 1);
+          button.classList.toggle("active", index === activeIndex);
+          button.classList.toggle("answered", Object.prototype.hasOwnProperty.call(answers, question));
+          button.classList.toggle("review", review.includes(question));
+        });
+      }
+
+      function renderQuestionButtons() {
+        for (let i = 1; i <= totalQuestions; i += 1) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "qbtn";
+          button.textContent = i;
+          button.dataset.goto = String(i - 1);
+          button.setAttribute("aria-label", "Go to question " + i);
+          buttonsWrap.appendChild(button);
+        }
+      }
+
+      function updateTimer() {
+        const remaining = Math.max(durationMinutes * 60 - Math.floor((Date.now() - startedAt) / 1000), 0);
+        const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+        const seconds = String(remaining % 60).padStart(2, "0");
+        timer.textContent = minutes + ":" + seconds;
+        timer.dataset.warning = remaining <= 300 ? "true" : "false";
+        if (remaining === 0 && !submitted) showSummary();
+      }
+
+      function getSummary() {
+        const answered = Object.keys(collectAnswers()).length;
+        const review = collectReview().length;
+        return {
+          total: totalQuestions,
+          answered,
+          unanswered: totalQuestions - answered,
+          review,
+        };
+      }
+
+      function showSummary() {
+        const summary = getSummary();
+        root.querySelector("[data-total]").textContent = summary.total;
+        root.querySelector("[data-answered]").textContent = summary.answered;
+        root.querySelector("[data-unanswered]").textContent = summary.unanswered;
+        root.querySelector("[data-review-count]").textContent = summary.review;
+        modal.classList.add("active");
+      }
+
+      function confirmSubmit() {
+        submitted = true;
+        saveLocal();
+        root.querySelector("#resultTitle").textContent = "Submitted";
+        root.querySelector(".modal .instruction").textContent = "Your answers have been saved locally. In Django, the platform bridge can collect these same inputs by data-question number.";
+        root.querySelector("[data-confirm-submit]").style.display = "none";
+      }
+
+      function animateParallax() {
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+        root.querySelectorAll("[data-tilt-card]").forEach((card) => {
+          card.style.transform = "rotateX(" + (-currentY * 2.5) + "deg) rotateY(" + (currentX * 2.5) + "deg)";
+        });
+        requestAnimationFrame(animateParallax);
+      }
+
+      root.addEventListener("mousemove", (event) => {
+        const rect = root.getBoundingClientRect();
+        targetX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+        targetY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+      });
+
+      root.addEventListener("input", () => {
+        saveLocal();
+        updateStatus();
+      });
+
+      root.addEventListener("change", () => {
+        saveLocal();
+        updateStatus();
+      });
+
+      root.addEventListener("click", (event) => {
+        const goto = event.target.closest("[data-goto]");
+        if (goto) setActiveQuestion(Number(goto.dataset.goto));
+        if (event.target.closest("[data-prev]")) setActiveQuestion(activeIndex - 1);
+        if (event.target.closest("[data-next]")) setActiveQuestion(activeIndex + 1);
+        if (event.target.closest("[data-submit]")) {
+          if (window.confirm("Open the submission summary?")) showSummary();
+        }
+        if (event.target.closest("[data-close-modal]")) modal.classList.remove("active");
+        if (event.target.closest("[data-confirm-submit]")) {
+          if (window.confirm("Confirm final submission?")) confirmSubmit();
+        }
+      });
+
+      window.collectAnswers = collectAnswers;
+      window.autoSaveAnswers = saveLocal;
+      window.submitTest = showSummary;
+      window.markAnswered = updateStatus;
+      window.scrollToQuestion = function (questionNumber) {
+        setActiveQuestion(Number(questionNumber) - 1);
+      };
+
+      renderQuestionButtons();
+      restoreLocal();
+      setActiveQuestion(0);
+      updateTimer();
+      setInterval(updateTimer, 1000);
+      setInterval(saveLocal, 10000);
+      requestAnimationFrame(animateParallax);
+    })();
+  </script>
+</div>

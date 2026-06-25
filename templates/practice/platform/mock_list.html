@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Full Mock Tests{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Full Mock Tests</h1>
+    <p class="muted" style="margin:0;">Listening, Reading, and Writing in one locked flow.</p>
+  </div>
+</section>
+<section class="test-grid">
+  {% for mock in mocks %}
+    <article class="card test-card">
+      <h2 style="margin:0;">{{ mock.title }}</h2>
+      <p class="muted">Listening + Reading + Writing</p>
+      <a class="button" href="{% url 'practice:mock_detail' mock.slug %}">Open mock</a>
+    </article>
+  {% empty %}
+    <div class="card" style="padding:24px;">No full mock tests published yet.</div>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<section class="card" style="padding:24px; max-width:960px; margin:28px auto;" data-article-page>
+  <span class="badge">Article</span>
+  <h1>{{ article.title }}</h1>
+  {% if article.audio_file %}
+    <audio controls style="width:100%; margin:12px 0;"><source src="{{ article.audio_file.url }}"></audio>
+  {% endif %}
+  {% if article.allow_highlighting %}
+    <div class="action-row" style="margin-bottom:12px;">
+      <button type="button" class="button secondary" data-article-highlight>Highlight selected text</button>
+      <button type="button" class="button secondary" data-article-clear>Clear highlights</button>
+    </div>
+  {% endif %}
+  <div class="article-frame">
+    <div class="article-content" data-article-content>{{ article.html_content|safe }}</div>
+  </div>
+  {% if article.vocabulary %}
+    <h2>Vocabulary</h2>
+    <pre style="white-space:pre-wrap; background:#f8fafc; border:1px solid #d8e0ec; border-radius:8px; padding:14px;">{{ article.vocabulary }}</pre>
+  {% endif %}
+</section>
+<script>
+  (function () {
+    const page = document.querySelector("[data-article-page]");
+    if (!page) return;
+    const content = page.querySelector("[data-article-content]");
+    page.addEventListener("click", (event) => {
+      if (event.target.closest("[data-article-clear]")) {
+        content.querySelectorAll(".student-highlight").forEach((span) => span.replaceWith(document.createTextNode(span.textContent)));
+        content.normalize();
+      }
+      if (!event.target.closest("[data-article-highlight]")) return;
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0 || !content.contains(selection.getRangeAt(0).commonAncestorContainer)) return;
+      const range = selection.getRangeAt(0);
+      const span = document.createElement("span");
+      span.className = "student-highlight";
+      try {
+        range.surroundContents(span);
+      } catch (error) {
+        span.textContent = selection.toString();
+        range.deleteContents();
+        range.insertNode(span);
+      }
+      selection.removeAllRanges();
+    });
+  })();
+</script>
+{% endblock %}

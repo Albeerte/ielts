@@ -1,0 +1,20 @@
+{
+  "reading": {
+    "1": "FALSE",
+    "2": "TRUE",
+    "3": "NOT GIVEN",
+    "4": "volunteers",
+    "5": "composting",
+    "6": "B",
+    "7": "C",
+    "8": "education"
+  },
+  "listening": {
+    "1": "Barker",
+    "2": "student",
+    "3": ["six", "6"],
+    "4": "B",
+    "5": "second",
+    "6": "A"
+  }
+}

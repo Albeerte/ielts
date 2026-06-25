@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Tests{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Tests</h1>
+    <p class="muted" style="margin:0;">Preview, edit, publish, or delete uploaded HTML tests.</p>
+  </div>
+  <a class="button" href="{% url 'practice:teacher_test_create' %}">Create test</a>
+</section>
+
+<table class="teacher-table">
+  <tr><th>Title</th><th>Skill</th><th>Section</th><th>Published</th><th>Updated</th><th>Actions</th></tr>
+  {% for test in tests %}
+    <tr>
+      <td>{{ test.title }}</td>
+      <td>{{ test.get_skill_display }}</td>
+      <td>{{ test.get_section_type_display }}</td>
+      <td>{% if test.is_published %}Yes{% else %}No{% endif %}</td>
+      <td>{{ test.updated_at|date:"M j, H:i" }}</td>
+      <td class="action-row">
+        <a href="{% url 'practice:teacher_test_preview' test.id %}">Preview</a>
+        <a href="{% url 'practice:teacher_test_edit' test.id %}">Edit</a>
+        <a href="{% url 'practice:teacher_test_delete' test.id %}">Delete</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">No tests yet.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

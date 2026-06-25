@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Dictation{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Dictation</h1>
+    <p class="muted" style="margin:0;">Listen, type what you hear, and check accuracy.</p>
+  </div>
+</section>
+<section class="test-grid">
+  {% for exercise in exercises %}
+    <article class="card test-card">
+      <h2 style="margin:0;">{{ exercise.title }}</h2>
+      <p class="muted">{{ exercise.duration_minutes }} minutes</p>
+      <a class="button" href="{% url 'practice:start_dictation' exercise.slug %}">Start dictation</a>
+    </article>
+  {% empty %}
+    <div class="card" style="padding:24px;">No dictation exercises published yet.</div>
+  {% endfor %}
+</section>
+{% endblock %}

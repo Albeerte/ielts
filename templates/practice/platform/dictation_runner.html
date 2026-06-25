@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ exercise.title }}{% endblock %}
+
+{% block content %}
+<section class="card" style="padding:24px; max-width:900px; margin:28px auto;">
+  <span class="badge">Dictation</span>
+  <h1>{{ exercise.title }}</h1>
+  <audio controls style="width:100%; margin:12px 0;">
+    <source src="{{ exercise.audio_file.url }}">
+  </audio>
+  {% if exercise.html_content %}
+    <div class="article-frame" style="margin-bottom:14px;"><div class="article-content">{{ exercise.html_content|safe }}</div></div>
+  {% endif %}
+  <form method="post" action="{% url 'practice:dictation_submit' attempt.id %}">
+    {% csrf_token %}
+    <label style="display:block; font-weight:800; margin-bottom:8px;">Your dictation</label>
+    <textarea name="submitted_text" rows="12" style="width:100%; border:1px solid #b9c6d8; border-radius:8px; padding:12px;"></textarea>
+    <div class="action-row" style="margin-top:12px;">
+      <button class="button" type="submit">Check dictation</button>
+      <a class="button secondary" href="{% url 'practice:dictation_list' %}">Back</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

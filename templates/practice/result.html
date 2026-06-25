@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Result | {{ attempt.task.title }}{% endblock %}
+
+{% block content %}
+  <section class="card" style="padding:24px; max-width:760px; margin:34px auto;">
+    <div class="muted" style="font-size:13px; font-weight:700; text-transform:uppercase;">
+      {{ attempt.task.get_test_type_display }} · Section {{ attempt.task.section_number }}
+    </div>
+    <h1 style="margin:6px 0 8px;">{{ attempt.task.title }}</h1>
+    <p class="muted" style="margin-top:0;">Attempt #{{ attempt.id }}</p>
+
+    {% if attempt.is_submitted %}
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:14px; margin:22px 0;">
+        <div style="border:1px solid #d8e0ec; border-radius:8px; padding:16px;">
+          <div class="muted">Score</div>
+          <strong style="font-size:30px;">{{ attempt.score }}/{{ attempt.total_questions }}</strong>
+        </div>
+        <div style="border:1px solid #d8e0ec; border-radius:8px; padding:16px;">
+          <div class="muted">Time spent</div>
+          <strong style="font-size:30px;">{{ attempt.time_spent_seconds }}s</strong>
+        </div>
+        <div style="border:1px solid #d8e0ec; border-radius:8px; padding:16px;">
+          <div class="muted">Submitted</div>
+          <strong>{{ attempt.submitted_at|date:"M j, Y H:i" }}</strong>
+        </div>
+      </div>
+    {% else %}
+      <p>This attempt has not been submitted yet.</p>
+      <a class="button" href="{{ attempt.task.get_absolute_url }}?attempt={{ attempt.id }}">Continue attempt</a>
+    {% endif %}
+
+    <h2 style="font-size:20px; margin-top:24px;">Your answers</h2>
+    <pre style="white-space:pre-wrap; border:1px solid #d8e0ec; border-radius:8px; padding:14px; background:#f8fafc;">{{ attempt.answers }}</pre>
+
+    <h2 style="font-size:20px; margin-top:24px;">Highlights</h2>
+    {% if attempt.highlights %}
+      <ul style="display:grid; gap:10px; padding-left:20px;">
+        {% for highlight in attempt.highlights %}
+          <li>
+            <strong>{{ highlight.text }}</strong>
+            {% if highlight.created_at %}
+              <span class="muted">({{ highlight.created_at }})</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No highlights saved.</p>
+    {% endif %}
+
+    <h2 style="font-size:20px; margin-top:24px;">Notes</h2>
+    {% if attempt.notes %}
+      <ul style="display:grid; gap:10px; padding-left:20px;">
+        {% for note in attempt.notes %}
+          <li>
+            <strong>{{ note.text }}</strong>
+            {% if note.created_at %}
+              <span class="muted">({{ note.created_at }})</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No notes saved.</p>
+    {% endif %}
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+      <a class="button" href="{% url 'practice:start_attempt' attempt.task.slug %}">Start again</a>
+      <a class="button secondary" href="{% url 'practice:task_list' %}">Back to tasks</a>
+    </div>
+  </section>
+{% endblock %}

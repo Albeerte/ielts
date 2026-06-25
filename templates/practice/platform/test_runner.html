@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ test.title }}{% endblock %}
+{% block main_class %}exam-shell{% endblock %}
+
+{% block content %}
+<section data-test-runner>
+  <div class="exam-topbar">
+    <div class="exam-title">
+      <h1>{{ test.title }}</h1>
+      <div class="exam-meta">{{ test.get_skill_display }} · {{ test.get_section_type_display }} · Attempt #{{ attempt.id }}</div>
+    </div>
+    <div class="exam-controls">
+      <span class="save-status" data-save-status>Not saved</span>
+      <span class="exam-timer" data-test-timer>{{ test.duration_minutes }}:00</span>
+      {% if test.allow_highlighting %}
+        <button type="button" class="exam-button warning" data-action="highlight">Highlight</button>
+        <button type="button" class="exam-button secondary" data-action="clear-highlights">Clear</button>
+      {% endif %}
+      <button type="button" class="exam-button secondary" data-action="notes">Notes</button>
+      <button type="button" class="exam-button secondary" data-action="save">Save</button>
+      <button type="button" class="exam-button" data-action="submit">Submit</button>
+    </div>
+  </div>
+
+  <div class="exam-content">
+    {% if test.audio_file %}
+      <div class="exam-audio">
+        <audio data-test-audio controls {% if test.auto_play_audio %}autoplay{% endif %}>
+          <source src="{{ test.audio_file.url }}">
+        </audio>
+      </div>
+    {% endif %}
+
+    <div class="uploaded-test-frame">
+      <div class="test-content" data-highlight-root>
+        {{ test.html_content|safe }}
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes-panel" data-notes-panel>
+    <header>
+      <strong>Notes</strong>
+      <button type="button" class="exam-button secondary" data-action="notes">Close</button>
+    </header>
+    <div class="notes-body">
+      <textarea data-note-input placeholder="Write a note..."></textarea>
+      <button type="button" class="exam-button" data-action="add-note">Add note</button>
+      <ul class="note-list" data-note-list></ul>
+    </div>
+  </aside>
+</section>
+
+{{ existing_answers|json_script:"testAnswersData" }}
+{{ existing_notes|json_script:"testNotesData" }}
+{{ existing_highlights|json_script:"testHighlightsData" }}
+<script id="testRunnerConfig" type="application/json">{{ runner_config_json|safe }}</script>
+<script src="{% static 'practice/test_renderer.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Podcasts{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Podcasts</h1>
+    <p class="muted" style="margin:0;">Audio lessons and podcast-style practice pages.</p>
+  </div>
+</section>
+<section class="test-grid">
+  {% for podcast in podcasts %}
+    <article class="card test-card">
+      <span class="badge">{{ podcast.get_section_type_display }}</span>
+      <h2 style="margin:0;">{{ podcast.title }}</h2>
+      {% if podcast.audio_file %}<audio controls style="width:100%;"><source src="{{ podcast.audio_file.url }}"></audio>{% endif %}
+      <a class="button" href="{% url 'practice:test_detail' podcast.slug %}">Open</a>
+    </article>
+  {% empty %}
+    <div class="card" style="padding:24px;">No podcasts published yet.</div>
+  {% endfor %}
+</section>
+{% endblock %}

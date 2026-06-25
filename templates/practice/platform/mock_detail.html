@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ mock.title }}{% endblock %}
+
+{% block content %}
+<section class="card" style="padding:24px; max-width:980px; margin:28px auto;">
+  <span class="badge">Full mock</span>
+  <h1>{{ mock.title }}</h1>
+  <p class="muted">Complete each section. Submitted sections are locked.</p>
+  <div class="test-grid">
+    {% for item in sections %}
+      <article class="card test-card">
+        <span class="badge">{{ item.test.get_skill_display }}</span>
+        <h2 style="margin:0;">{{ item.test.title }}</h2>
+        {% if item.attempt %}
+          <p class="muted">{% if item.attempt.is_submitted %}Locked · {{ item.attempt.score }}/{{ item.attempt.total_questions }}{% else %}In progress{% endif %}</p>
+        {% endif %}
+        {% if item.attempt and not item.attempt.is_locked %}
+          <a class="button" href="{% url 'practice:test_runner' item.attempt.id %}">Continue</a>
+        {% elif item.attempt and item.attempt.is_locked %}
+          <a class="button secondary" href="{% url 'practice:test_result' item.attempt.id %}">View result</a>
+        {% else %}
+          <a class="button" href="{% url 'practice:start_test_attempt' item.test.slug %}">Start section</a>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+  {% if complete %}
+    <div class="card" style="padding:16px; margin-top:18px;">
+      <div class="muted">Final result</div>
+      <strong style="font-size:30px;">{{ total_score }}/{{ total_questions }}</strong>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>{{ title }}</h1>
+    <p class="muted" style="margin:0;">Paste HTML or upload an HTML file. Only trusted teachers should use this form.</p>
+  </div>
+</section>
+
+<form method="post" enctype="multipart/form-data" class="card form-grid" style="padding:20px;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}
+    <div class="form-row">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<div class="muted" style="font-size:13px;">{{ field.help_text }}</div>{% endif %}
+      {{ field.errors }}
+    </div>
+  {% endfor %}
+  <div class="action-row">
+    <button class="button" type="submit">Save</button>
+    <a class="button secondary" href="{% url 'practice:teacher_dashboard' %}">Cancel</a>
+    {% if object and object.id %}
+      <a class="button secondary" href="{% url 'practice:teacher_test_preview' object.id %}">Preview</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Preview | {{ test.title }}{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Preview: {{ test.title }}</h1>
+    <p class="muted" style="margin:0;">This renders the uploaded HTML before publishing.</p>
+  </div>
+  <div class="action-row">
+    <a class="button" href="{% url 'practice:teacher_test_edit' test.id %}">Edit</a>
+    <a class="button secondary" href="{% url 'practice:teacher_tests' %}">Back</a>
+  </div>
+</section>
+
+{% if test.audio_file %}
+  <div class="exam-audio"><audio controls {% if test.auto_play_audio %}autoplay{% endif %}><source src="{{ test.audio_file.url }}"></audio></div>
+{% endif %}
+<section class="uploaded-test-frame">
+  <div class="test-content">{{ test.html_content|safe }}</div>
+</section>
+{% endblock %}

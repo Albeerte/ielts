@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Articles{% endblock %}
+
+{% block content %}
+<section class="platform-header">
+  <div>
+    <h1>Articles</h1>
+    <p class="muted" style="margin:0;">Read, highlight, and review vocabulary.</p>
+  </div>
+</section>
+<section class="test-grid">
+  {% for article in articles %}
+    <article class="card test-card">
+      <h2 style="margin:0;">{{ article.title }}</h2>
+      <p class="muted">{% if article.audio_file %}Audio article · {% endif %}{% if article.allow_highlighting %}Highlighting enabled{% endif %}</p>
+      <a class="button" href="{% url 'practice:article_detail' article.slug %}">Read</a>
+    </article>
+  {% empty %}
+    <div class="card" style="padding:24px;">No articles published yet.</div>
+  {% endfor %}
+</section>
+{% endblock %}
